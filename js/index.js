@@ -77,7 +77,11 @@ const BOTLIST = {
 var change_mid = function(word) {
     if(word == 'ㅔ') return 'ㅐ';
     else if(word == 'ㅐ') return 'ㅔ';
-    else return word.replace('ㅖ', 'ㅒ').replace('ㅙ', 'ㅚ').replace('ㅛ', 'ㅕ');
+    else if(word == 'ㅙ') return 'ㅚ';
+    else if(word == 'ㅚ') return 'ㅙ';
+    else if(word == 'ㅖ') return 'ㅒ';
+    else if(word == 'ㅒ') return 'ㅖ';
+    else return word.replace('ㅛ', 'ㅕ');
 }
 
 var change_bot = function(word) {
@@ -88,14 +92,60 @@ var change_bot = function(word) {
 }
 
 var second_filter = function(word) {
-    return word.replace('떡', '떻').replace('안', '않').replace('괜', '괞').replace('찮', '찬').replace('떻', '떡');
+    return word.replace('떡', '떻').replace('안', '않').replace('괜', '괞').replace('찮', '찬').replace('떻', '떡').replace('송', '성');
 }
 
 var final_filter = function(word) {
-    return word.replace('아니', '않이').replace('읽으', '일그');
+    var result_imoji = '';
+
+    if(word.includes('...')) { // 크라이
+        var rand = parseInt(Math.random() * 10000 % 5);
+        for(var i = -7; i < rand; i++) {
+            if(parseInt(Math.random() * 10000 % 5) == 4) {
+                result_imoji += 'ㅜ';
+            }
+            result_imoji += 'ㅠ';
+        }
+        var rand = parseInt(Math.random() * 10000 % 4);
+        for(var i = -7; i < rand; i++) {
+            if(parseInt(Math.random() * 10000 % 5) == 4) {
+                result_imoji += '😢';
+            }
+            result_imoji += '😭';
+        }
+    }
+    else if(word.includes('!!!')) { // 화남
+        var rand = parseInt(Math.random() * 10000 % 5);
+        for(var i = -7; i < rand; i++) {
+            if(parseInt(Math.random() * 10000 % 5) == 4) {
+                result_imoji += '@';
+            }
+            result_imoji += ';';
+        }
+        var rand = parseInt(Math.random() * 10000 % 4);
+        for(var i = -7; i < rand; i++) {
+            if(parseInt(Math.random() * 10000 % 5) == 4) {
+                result_imoji += '!';
+            }
+            result_imoji += '🤬';
+        }
+    }
+    return word
+    .replace('아니', '않이')
+    .replace('읽으', '일그')
+    .replace('합니', '함미')
+    .replace('습니', '슴미') + result_imoji;
 }
 
 var getBottom = function() {
+
+    console.log('가'.charCodeAt(0));
+    // console.log('ㅥ'.charCodeAt(0));
+    console.log('ㅏ'.charCodeAt(0));
+    // console.log('A'.charCodeAt(0));
+    // console.log(String.fromCharCode(12592));
+
+
     var letterList = new Array();
     var result = new Array();
 
@@ -105,9 +155,19 @@ var getBottom = function() {
 
         var unicodeDec = content.charCodeAt(i);
 
-        if(unicodeDec < 1100) {
+        console.log(unicodeDec);
+
+        if(unicodeDec < 12593) {
             letterList.push(content[i]);
-            console.log(content[i]);
+            letterList.push(undefined);
+            letterList.push(undefined);
+            continue;
+        }
+        else if(unicodeDec < 44032) {
+            console.log('자음만');
+            letterList.push(content[i]);
+            letterList.push(undefined);
+            letterList.push(undefined);
             continue;
         }
 
@@ -130,9 +190,20 @@ var getBottom = function() {
 
     for(var i = 0; i < letterList.length; i+=3) {
 
-        if((letterList[i] + '').charCodeAt(0) < 1100) {
+        if(((letterList[i] + '').charCodeAt(0) < 44032) && letterList[i+1] == undefined) { // 완성된 글자가 아닐 경우
+            // if(letterList[i+1] != undefined && ((letterList[i+1] + '').charCodeAt(0) < 12623)) { // 중성이 모음이 아닐 경우
+            //     if(letterList[i+2] != undefined && ((letterList[i+2] + '').charCodeAt(0) < 12623)) { // 종성이 모음이 아닐 경우
+            //         result.push(letterList[i]);
+            //         result.push(letterList[i+1]);
+            //         result.push(letterList[i+2]);
+            //         continue;
+            //     }
+            //     result.push(letterList[i]);
+            //     result.push(letterList[i+1]);
+            //     i -= 1;
+            //     continue;
+            // }
             result.push(letterList[i]);
-            i -= 2;
             continue;
         }
 
@@ -142,14 +213,16 @@ var getBottom = function() {
 
         if(parseInt(Math.random() * 10000000 % 5) === 2) {
             result.push(top);
-            result.push(change_mid(mid));
+            if(mid != undefined) {
+                result.push(change_mid(mid));
+            }
             if(bot != undefined) {
                 result.push(change_bot(bot));
             }
+            continue;
         }
         else {
             var topIndex = function(word) {
-                console.log(word);
                 for(var key in TOPLIST) {
                     if(TOPLIST[key] == word) {
                         return parseInt(key);
@@ -159,7 +232,6 @@ var getBottom = function() {
 
             var midIndex = function(word) {
                 let replaced = change_mid(word);
-                console.log(replaced);
                 for(var key in MIDLIST) {
                     if(MIDLIST[key] == replaced) {
                         return parseInt(key);
@@ -180,33 +252,30 @@ var getBottom = function() {
             // console.log(mid);
             // console.log(bot);
 
-            if(bot != undefined) {
-                result.push(String.fromCharCode((((topIndex(top) * 21) + midIndex(mid)) * 28 + botIndex(bot)) + 44032));
+
+            if(mid != undefined) {
+                if(bot != undefined) {
+                    console.log('asdf');
+                    result.push(String.fromCharCode((((topIndex(top) * 21) + midIndex(mid)) * 28 + botIndex(bot)) + 44032)); // 둘 다 있을때
+                }
+                else {
+                    console.log('2222');
+                    result.push(String.fromCharCode((((topIndex(top) * 21) + midIndex(mid)) * 28) + 44032)); // 받침만 없을 때
+                }
             }
             else {
-                result.push(String.fromCharCode((((topIndex(top) * 21) + midIndex(mid)) * 28) + 44032));
+                for(var j = 0; j < 50; j++) {
+                    console.log(top);
+                }
+                result.push(top);
             }
         }
-    }
-
-    var rand = parseInt(Math.random() * 10000 % 5);
-    for(var i = -7; i < rand; i++) {
-        if(parseInt(Math.random() * 10000 % 5) == 4) {
-            result.push('@');
-        }
-        result.push(';');
-    }
-    var rand = parseInt(Math.random() * 10000 % 4);
-    for(var i = -7; i < rand; i++) {
-        if(parseInt(Math.random() * 10000 % 5) == 4) {
-            result.push('!');
-        }
-        result.push('🤬');
     }
 
     var html = '';
 
-    // console.log(result);
+    console.log(letterList);
+    console.log(result);
 
     for(var i = 0; i < result.length; i++) {
         html += second_filter(result[i]);
