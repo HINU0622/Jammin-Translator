@@ -88,17 +88,28 @@ var change_bot = function(word) {
     if(word == 'ㅅ') return 'ㅌ';
     else if(word == 'ㅆ') return 'ㅈ';
     else if(word == 'ㅎ') return 'ㅅ';
-    else return word.replace('ㅉ', 'ㅈ');
+    else return word.replace('ㅉ', 'ㅈ').replace('ㅄ', 'ㅂ');
 }
 
 var second_filter = function(word) {
+    if(word == '됮') {
+        var rand = parseInt((Math.random() * 10000) % 2);
+        if(rand == 0) {
+            return '됬';
+        }
+        else {
+            return '됐었';
+        }
+    }
     return word.replace('떡', '떻').replace('안', '않').replace('괜', '괞').replace('찮', '찬').replace('떻', '떡').replace('송', '성');
 }
 
 var final_filter = function(word) {
     var result_imoji = '';
+    var english = /^[A-Za-z]*$/;
 
     if(word.includes('...')) { // 크라이
+        word = word.replace('...', '');
         var rand = parseInt(Math.random() * 10000 % 5);
         for(var i = -7; i < rand; i++) {
             if(parseInt(Math.random() * 10000 % 5) == 4) {
@@ -115,6 +126,7 @@ var final_filter = function(word) {
         }
     }
     else if(word.includes('!!!')) { // 화남
+        word = word.replace('!!!', '');
         var rand = parseInt(Math.random() * 10000 % 5);
         for(var i = -7; i < rand; i++) {
             if(parseInt(Math.random() * 10000 % 5) == 4) {
@@ -130,11 +142,37 @@ var final_filter = function(word) {
             result_imoji += '🤬';
         }
     }
-    return word
+
+    if(english.test(word)) {
+        return word.toLocaleLowerCase()
+        .replace('ear', 'are')
+        .replace('ea', 'ae')
+        .replace('ar', 'er')
+        .replace('ey', 'i')
+        .replace('el', 'le')
+        .replace('ight', 'yt')
+        .replace('ei', 'i')
+        .replace('ie', 'e')
+        .replace('ll', 'l')
+        .replace('ou', 'oau')
+        .replace('au', 'oau')
+        .replace('ay', 'aye')
+        .replace('rt', 't')
+        .replace('ntr', 'NTR')
+        .replace('er', 'or')
+        .replace('아니', '않이')
+        .replace('읽으', '일그')
+        .replace('합니', '함미')
+        .replace('습니', '슴미')
+        .replace() + result_imoji;
+    }
+
+    return word.toLocaleLowerCase()
     .replace('아니', '않이')
     .replace('읽으', '일그')
     .replace('합니', '함미')
-    .replace('습니', '슴미') + result_imoji;
+    .replace('습니', '슴미')
+    .replace() + result_imoji;
 }
 
 var getBottom = function() {
@@ -211,7 +249,7 @@ var getBottom = function() {
         mid = letterList[i+1];
         bot = letterList[i+2];
 
-        if(parseInt(Math.random() * 10000000 % 5) === 2) {
+        if(parseInt(Math.random() * 10000000 % 13) === 12) {
             result.push(top);
             if(mid != undefined) {
                 result.push(change_mid(mid));
@@ -255,11 +293,9 @@ var getBottom = function() {
 
             if(mid != undefined) {
                 if(bot != undefined) {
-                    console.log('asdf');
                     result.push(String.fromCharCode((((topIndex(top) * 21) + midIndex(mid)) * 28 + botIndex(bot)) + 44032)); // 둘 다 있을때
                 }
                 else {
-                    console.log('2222');
                     result.push(String.fromCharCode((((topIndex(top) * 21) + midIndex(mid)) * 28) + 44032)); // 받침만 없을 때
                 }
             }
@@ -274,7 +310,7 @@ var getBottom = function() {
 
     var html = '';
 
-    console.log(letterList);
+    // console.log(letterList);
     console.log(result);
 
     for(var i = 0; i < result.length; i++) {
