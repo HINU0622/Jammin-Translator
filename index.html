@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>번역기</title>
     <meta name="decsription" content="잼민이 언어 번역기">
-    <script src="./js/index.js"></script>
+    <script type="text/javascript" src="./js/index.js"></script>
 </head>
 <body>
-    <input id="text-input" type="text" style="width: 90vw;"/>
+    <input id="text-input" type="text" style="width: 90vw;" onkeypress="if(event.keyCode==13) getBottom();"/>
     <button onclick="getBottom();">dd</button>
     <p id="result-text" style="font-size: 25px;"></p>
 </body>
